@@ -1,0 +1,71 @@
+package holymagic.vkpublicmanagement.service;
+
+import holymagic.vkpublicmanagement.model.Root;
+import jakarta.ws.rs.core.UriBuilder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ExchangeService {
+
+    private final RestClient restClient;
+
+    @Value("${api_version}")
+    private String version;
+    @Value("${service_key}")
+    private String accessToken;
+    @Value("${my_public_domain}")
+    private String myDomain;
+    @Value("${my_public_owner_id}")
+    private String ownerId;
+
+    @Value("${get_from_wall_path}")
+    private String getFromWallPath;
+    @Value("${get_by_id_path}")
+    private String getByIdPath;
+    @Value("${wall_search_path}")
+    private String wallSearchPath;
+
+    public <T> T getData(URI uri, ParameterizedTypeReference<Root<T>> reference) {
+        return restClient.get()
+                .uri(uri)
+                .retrieve()
+                .body(reference)
+                .getResponse();
+    }
+
+    public URI provideGetFromWallUri(int count, int offset) {
+        return UriBuilder.fromPath(getFromWallPath)
+                .queryParam("count", count).queryParam("offset", offset)
+                .queryParam("access_token", accessToken)
+                .queryParam("v", version).queryParam("domain", myDomain)
+                .build();
+    }
+
+    public URI provideGetByIdUri(String id) {
+        return UriBuilder.fromPath(getByIdPath)
+                .queryParam("posts", ownerId + "_" + id)
+                .queryParam("access_token", accessToken)
+                .queryParam("v", version)
+                .build();
+    }
+
+    public URI provideWallSearchUri(String query, int count, int offset) {
+        return UriBuilder.fromPath(wallSearchPath)
+                .queryParam("v", version).queryParam("access_token", accessToken)
+                .queryParam("owner_id", ownerId).queryParam("domain", myDomain)
+                .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
+                .queryParam("count", count).queryParam("offset", offset).build();
+    }
+
+}
