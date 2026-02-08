@@ -41,6 +41,7 @@ public class RestClientConfig {
                 .baseUrl(baseUrl)
                 .defaultHeaders(header -> {
                     header.add("Accept", "application/json");
+                    header.add("Content-Type", "application/json");
                 })
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, handleClientError())
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, handleServerError())
