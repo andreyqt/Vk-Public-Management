@@ -1,5 +1,6 @@
 package holymagic.vkpublicmanagement.exception;
 
+import jakarta.security.auth.message.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,6 +56,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleHandlerMethodValidationException(HandlerMethodValidationException e) {
         return new ErrorResponse("argument validation failed");
+    }
+
+    @ExceptionHandler(AuthUriSyntaxException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleAuthUriSyntaxException(AuthUriSyntaxException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
 }
