@@ -29,25 +29,22 @@ public class UserService {
     private String version;
     @Value("${user_token_msg}")
     private String defaultTokenMsg;
-    @Value("${default_scope}")
-    private String defaultScope;
     @Value("${user_token_ttl}")
     private Long userTokenTtl;
 
-    public AuthUri init() {
+    public AuthUri init(String scope) {
         URI uri = UriBuilder.fromUri(authUri)
                 .queryParam("client_id", appId)
                 .queryParam("redirect_uri", authRedirectUri)
                 .queryParam("response_type", "token")
-                .queryParam("scope", defaultScope)
+                .queryParam("scope", scope)
                 .queryParam("display", "page")
                 .queryParam("v", version)
                 .build();
         return new AuthUri(uri);
     }
 
-    public UserToken extractToken(String fragment) {
-
+    public UserToken extractToken(String fragment, String scope) {
         Pattern tokenPattern = Pattern.compile("access_token=([^&]+)");
         Matcher tokenMatcher = tokenPattern.matcher(fragment);
         String token = tokenMatcher.find() ? tokenMatcher.group(1) : null;
@@ -56,7 +53,7 @@ public class UserService {
         Matcher userIdMatcher = userIdPattern.matcher(fragment);
         Long userId = Long.valueOf(userIdMatcher.find() ? userIdMatcher.group(1) : "0");
 
-        return new UserToken(userId, defaultTokenMsg, token, defaultScope, userTokenTtl);
+        return new UserToken(userId, defaultTokenMsg, token, scope, userTokenTtl);
     }
 
 }

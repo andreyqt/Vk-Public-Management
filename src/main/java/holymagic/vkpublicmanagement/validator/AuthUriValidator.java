@@ -4,6 +4,8 @@ import holymagic.vkpublicmanagement.exception.AuthUriSyntaxException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class AuthUriValidator {
 
@@ -33,5 +35,17 @@ public class AuthUriValidator {
             throw new AuthUriSyntaxException("missing authUri userId pattern");
         }
     }
+
+    public void validateScope(String scope) {
+        if (!allowedScopes.contains(scope)) {
+            throw new AuthUriSyntaxException("invalid scope: " + scope);
+        }
+    }
+
+    private final List<String> allowedScopes = List.of(
+            "notify", "friends", "photos", "audio", "video", "stories", "pages", "menu",
+            "status", "notes", "messages", "wall", "ads", "offline", "docs", "groups", "notifications",
+            "stats", "email", "market", "phone"
+    );
 
 }

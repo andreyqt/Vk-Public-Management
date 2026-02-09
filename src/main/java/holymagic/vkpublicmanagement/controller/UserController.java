@@ -4,6 +4,7 @@ import holymagic.vkpublicmanagement.model.user.AuthUri;
 import holymagic.vkpublicmanagement.model.user.UserToken;
 import holymagic.vkpublicmanagement.service.UserService;
 import holymagic.vkpublicmanagement.validator.AuthUriValidator;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -23,16 +25,21 @@ public class UserController {
     private final AuthUriValidator authUriValidator;
 
     @GetMapping("/init")
-    public ResponseEntity<AuthUri> init() {
-        return ResponseEntity.ok(userService.init());
+    public ResponseEntity<AuthUri> init(
+            @RequestParam(required = false, defaultValue = "wall") String scope,
+            HttpSession session) {
+        authUriValidator.validateScope(scope);
+        session.setAttribute("scope", scope);
+        return ResponseEntity.ok(userService.init(scope));
     }
 
     @PostMapping("/exchange")
-    public ResponseEntity<UserToken> exchange(@RequestBody String uri) {
-        log.info("uri: {}", uri);
+    public ResponseEntity<UserToken> exchange(@RequestBody String uri, HttpSession session) {
+        log.info("received uri: {}", uri);
         authUriValidator.validateAuthUri(uri);
         String fragment = uri.split("#")[1];
-        return ResponseEntity.ok(userService.extractToken(fragment));
+        String scope = (String) session.getAttribute("scope");
+        return ResponseEntity.ok(userService.extractToken(fragment, scope));
     }
 
 }
