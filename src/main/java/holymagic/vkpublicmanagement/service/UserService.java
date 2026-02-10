@@ -1,6 +1,7 @@
 package holymagic.vkpublicmanagement.service;
 
 import holymagic.vkpublicmanagement.model.user.AuthUri;
+import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.user.UserToken;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.USER_RESPONSE_REF;
 
 @Slf4j
 @Service
@@ -54,6 +57,11 @@ public class UserService {
         Long userId = Long.valueOf(userIdMatcher.find() ? userIdMatcher.group(1) : "0");
 
         return new UserToken(userId, defaultTokenMsg, token, scope, userTokenTtl);
+    }
+
+    public User getUser(Long userId, String token) {
+        URI uri = exchangeService.provideGetUserUri(userId, token);
+        return exchangeService.getData(uri, USER_RESPONSE_REF).getFirst();
     }
 
 }
