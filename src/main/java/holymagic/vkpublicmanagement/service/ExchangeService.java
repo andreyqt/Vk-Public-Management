@@ -39,6 +39,10 @@ public class ExchangeService {
     private String wallSearchPath;
     @Value("${get_user_path}")
     private String getUserPath;
+    @Value("${get_followers_path}")
+    private String getFollowersPath;
+    @Value("${get_subscriptions_path}")
+    private String getSubscriptionsPath;
 
     public <T> T getData(URI uri, ParameterizedTypeReference<Root<T>> reference) {
         return restClient.get()
@@ -78,6 +82,23 @@ public class ExchangeService {
                 .queryParam("user_ids", userId)
                 .queryParam("fields", FIELDS)
                 .queryParam("v", version)
+                .build();
+    }
+
+    public URI provideGetFollowersUri(Long userId, String token) {
+        return UriBuilder.fromPath(getFollowersPath)
+                .queryParam("user_id", userId)
+                .queryParam("access_token", token)
+                .queryParam("v", version)
+                .build();
+    }
+
+    public URI provideGetSubscriptionsUri(Long userId, String token) {
+        return UriBuilder.fromPath(getSubscriptionsPath)
+                .queryParam("user_id", userId)
+                .queryParam("access_token", token)
+                .queryParam("v", version)
+                .queryParam("extended", "1")
                 .build();
     }
 

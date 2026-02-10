@@ -3,6 +3,7 @@ package holymagic.vkpublicmanagement.service;
 import holymagic.vkpublicmanagement.model.user.AuthUri;
 import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.user.UserToken;
+import holymagic.vkpublicmanagement.model.user.subscription.Subscription;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.FOLLOWER_RESPONSE_REF;
+import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.SUBSCRIPTION_RESPONSE_REF;
 import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.USER_RESPONSE_REF;
 
 @Slf4j
@@ -62,6 +66,18 @@ public class UserService {
     public User getUser(Long userId, String token) {
         URI uri = exchangeService.provideGetUserUri(userId, token);
         return exchangeService.getData(uri, USER_RESPONSE_REF).getFirst();
+    }
+
+    public List<Long> getFollowers(Long userId, String token) {
+        URI uri = exchangeService.provideGetFollowersUri(userId, token);
+        return exchangeService.getData(uri, FOLLOWER_RESPONSE_REF).getItems();
+    }
+
+    public List<Subscription> getSubscriptions(Long userId, String token) {
+        URI uri = exchangeService.provideGetSubscriptionsUri(userId, token);
+        List<Subscription> response = exchangeService.getData(uri, SUBSCRIPTION_RESPONSE_REF).getItems();
+        log.info("received {} subscriptions", response.size());
+        return response;
     }
 
 }

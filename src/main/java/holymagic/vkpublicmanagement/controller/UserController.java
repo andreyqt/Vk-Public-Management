@@ -3,6 +3,7 @@ package holymagic.vkpublicmanagement.controller;
 import holymagic.vkpublicmanagement.model.user.AuthUri;
 import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.user.UserToken;
+import holymagic.vkpublicmanagement.model.user.subscription.Subscription;
 import holymagic.vkpublicmanagement.service.UserService;
 import holymagic.vkpublicmanagement.validator.AuthUriValidator;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,6 +52,20 @@ public class UserController {
             @PathVariable Long id,
             @RequestParam String token) {
         return ResponseEntity.ok(userService.getUser(id, token));
+    }
+
+    @GetMapping("/id/{id}/followers")
+    public ResponseEntity<List<Long>> getFollowers(
+            @PathVariable Long id,
+            @RequestParam String token) {
+        return ResponseEntity.ok(userService.getFollowers(id, token));
+    }
+
+    @GetMapping("/id/{id}/subscriptions")
+    public ResponseEntity<List<Subscription>> getSubscriptions(
+            @PathVariable Long id,
+            @RequestParam String token) {
+        return ResponseEntity.ok(userService.getSubscriptions(id, token));
     }
 
 }
