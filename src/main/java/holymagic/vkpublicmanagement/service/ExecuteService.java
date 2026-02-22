@@ -1,6 +1,5 @@
 package holymagic.vkpublicmanagement.service;
 
-import holymagic.vkpublicmanagement.dto.CountResponseDto;
 import holymagic.vkpublicmanagement.exception.EmptyResponseException;
 import holymagic.vkpublicmanagement.mapper.CountResponseMapper;
 import holymagic.vkpublicmanagement.model.exec.CountResponse;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 
 import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.EXEC_COUNT_REF;
 
