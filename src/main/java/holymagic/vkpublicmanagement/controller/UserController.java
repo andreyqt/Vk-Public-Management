@@ -1,6 +1,5 @@
 package holymagic.vkpublicmanagement.controller;
 
-import holymagic.vkpublicmanagement.exception.SessionExpiredException;
 import holymagic.vkpublicmanagement.model.user.AuthUri;
 import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.user.UserToken;
@@ -8,7 +7,6 @@ import holymagic.vkpublicmanagement.model.user.subscription.Subscription;
 import holymagic.vkpublicmanagement.service.UserService;
 import holymagic.vkpublicmanagement.validator.AuthUriValidator;
 import jakarta.servlet.http.HttpSession;
-import jakarta.websocket.SessionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
