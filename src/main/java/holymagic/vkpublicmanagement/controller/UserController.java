@@ -1,5 +1,6 @@
 package holymagic.vkpublicmanagement.controller;
 
+import holymagic.vkpublicmanagement.exception.SessionExpiredException;
 import holymagic.vkpublicmanagement.model.user.AuthUri;
 import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.user.UserToken;
@@ -7,6 +8,7 @@ import holymagic.vkpublicmanagement.model.user.subscription.Subscription;
 import holymagic.vkpublicmanagement.service.UserService;
 import holymagic.vkpublicmanagement.validator.AuthUriValidator;
 import jakarta.servlet.http.HttpSession;
+import jakarta.websocket.SessionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +45,7 @@ public class UserController {
         log.info("received uri: {}", uri);
         authUriValidator.validateAuthUri(uri);
         String fragment = uri.split("#")[1];
-        String scope = (String) session.getAttribute("scope");
+        String scope = authUriValidator.validateSessionScope(session);
         return ResponseEntity.ok(userService.extractToken(fragment, scope));
     }
 

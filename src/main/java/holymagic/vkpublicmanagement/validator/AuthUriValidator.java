@@ -1,6 +1,8 @@
 package holymagic.vkpublicmanagement.validator;
 
 import holymagic.vkpublicmanagement.exception.AuthUriSyntaxException;
+import holymagic.vkpublicmanagement.exception.SessionExpiredException;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +42,14 @@ public class AuthUriValidator {
         if (!allowedScopes.contains(scope)) {
             throw new AuthUriSyntaxException("invalid scope: " + scope);
         }
+    }
+
+    public String validateSessionScope(HttpSession session) {
+        String scope = (String) session.getAttribute("scope");
+        if (scope == null) {
+            throw new SessionExpiredException("Session has expired, you have to start again!");
+        }
+        return scope;
     }
 
     private final List<String> allowedScopes = List.of(

@@ -4,6 +4,7 @@ import holymagic.vkpublicmanagement.model.user.AuthUri;
 import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.user.UserToken;
 import holymagic.vkpublicmanagement.model.user.subscription.Subscription;
+import jakarta.websocket.SessionException;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
