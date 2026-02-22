@@ -1,5 +1,6 @@
 package holymagic.vkpublicmanagement.model;
 
+import holymagic.vkpublicmanagement.model.exec.CountResponse;
 import holymagic.vkpublicmanagement.model.user.FollowerResponse;
 import holymagic.vkpublicmanagement.model.user.SubscriptionResponse;
 import holymagic.vkpublicmanagement.model.user.User;
@@ -24,6 +25,9 @@ public class ParameterizedTypeReferences {
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Root<SubscriptionResponse>> SUBSCRIPTION_RESPONSE_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Root<CountResponse>> EXEC_COUNT_REF =
             new ParameterizedTypeReference<>() {};
 
 }

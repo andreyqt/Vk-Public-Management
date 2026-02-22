@@ -37,6 +37,7 @@ public class ExchangeService {
     private String getByIdPath;
     @Value("${wall_search_path}")
     private String wallSearchPath;
+
     @Value("${get_user_path}")
     private String getUserPath;
     @Value("${get_followers_path}")
@@ -47,6 +48,15 @@ public class ExchangeService {
     public <T> T getData(URI uri, ParameterizedTypeReference<Root<T>> reference) {
         return restClient.get()
                 .uri(uri)
+                .retrieve()
+                .body(reference)
+                .getResponse();
+    }
+
+    public <T> T getDataForExec(URI uri, ParameterizedTypeReference<Root<T>> reference) {
+        return restClient.post()
+                .uri(uri)
+                .body("{}")
                 .retrieve()
                 .body(reference)
                 .getResponse();
@@ -99,6 +109,14 @@ public class ExchangeService {
                 .queryParam("access_token", token)
                 .queryParam("v", version)
                 .queryParam("extended", "1")
+                .build();
+    }
+
+    public URI provideGetCountExecUri(String path, String query, String domain, int offset) {
+        return UriBuilder.fromPath(path)
+                .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
+                .queryParam("domain", domain).queryParam("offset", offset)
+                .queryParam("access_token", accessToken).queryParam("v", version)
                 .build();
     }
 
