@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import static holymagic.vkpublicmanagement.model.user.UserFields.FIELDS;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,12 @@ public class ExchangeService {
     private String getByIdPath;
     @Value("${wall_search_path}")
     private String wallSearchPath;
+    @Value("${get_user_path}")
+    private String getUserPath;
+    @Value("${get_followers_path}")
+    private String getFollowersPath;
+    @Value("${get_subscriptions_path}")
+    private String getSubscriptionsPath;
 
     public <T> T getData(URI uri, ParameterizedTypeReference<Root<T>> reference) {
         return restClient.get()
@@ -66,6 +74,32 @@ public class ExchangeService {
                 .queryParam("owner_id", ownerId).queryParam("domain", myDomain)
                 .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
                 .queryParam("count", count).queryParam("offset", offset).build();
+    }
+
+    public URI provideGetUserUri(Long userId, String token) {
+        return UriBuilder.fromPath(getUserPath)
+                .queryParam("access_token", token)
+                .queryParam("user_ids", userId)
+                .queryParam("fields", FIELDS)
+                .queryParam("v", version)
+                .build();
+    }
+
+    public URI provideGetFollowersUri(Long userId, String token) {
+        return UriBuilder.fromPath(getFollowersPath)
+                .queryParam("user_id", userId)
+                .queryParam("access_token", token)
+                .queryParam("v", version)
+                .build();
+    }
+
+    public URI provideGetSubscriptionsUri(Long userId, String token) {
+        return UriBuilder.fromPath(getSubscriptionsPath)
+                .queryParam("user_id", userId)
+                .queryParam("access_token", token)
+                .queryParam("v", version)
+                .queryParam("extended", "1")
+                .build();
     }
 
 }

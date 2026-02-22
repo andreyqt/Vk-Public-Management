@@ -57,4 +57,16 @@ public class GlobalExceptionHandler {
         return new ErrorResponse("argument validation failed");
     }
 
+    @ExceptionHandler(AuthUriSyntaxException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleAuthUriSyntaxException(AuthUriSyntaxException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(SessionExpiredException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleSessionExpiredException(SessionExpiredException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 }
