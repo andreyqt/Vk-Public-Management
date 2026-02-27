@@ -20,6 +20,8 @@ public class ExecuteService {
 
     @Value("${exec_get_count_path}")
     private String getCountPath;
+    @Value("${exec_get_count_over_period}")
+    private String getCountOverPeriodPath;
 
     public CountResponse getCount(String query, String domain) {
         URI uri = exchangeService.provideGetCountExecUri(getCountPath, query, domain);
@@ -28,12 +30,19 @@ public class ExecuteService {
         return response;
     }
 
+    public CountResponse getCountOverPeriod(long beginUnixTimestamp, long endUnixTimestamp,
+                                            String query, String domain) {
+        URI uri = exchangeService.provideGetCountOverPeriodExecUri(getCountOverPeriodPath,
+                beginUnixTimestamp, endUnixTimestamp,
+                query, domain);
+        CountResponse response = exchangeService.getDataForExec(uri, EXEC_COUNT_REF);
+        validateCountResponse(response);
+        return response;
+    }
+
     private void validateCountResponse(CountResponse response) {
         if (response.getCount() == 0) {
             throw new EmptyResponseException("No results found");
-        }
-        if (response.getMessage().isEmpty()) {
-            response.setMessage("success");
         }
     }
 

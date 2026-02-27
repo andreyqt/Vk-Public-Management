@@ -120,4 +120,16 @@ public class ExchangeService {
                 .build();
     }
 
+    public URI provideGetCountOverPeriodExecUri(String path,
+                                                long beginUnixTimestamp, long endUnixTimestamp,
+                                                String query, String domain) {
+        return UriBuilder.fromPath(path)
+                .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
+                .queryParam("begin", beginUnixTimestamp)
+                .queryParam("end", endUnixTimestamp)
+                .queryParam("domain", domain)
+                .queryParam("access_token", accessToken).queryParam("v", version)
+                .build();
+    }
+
 }
