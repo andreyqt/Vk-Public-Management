@@ -112,10 +112,10 @@ public class ExchangeService {
                 .build();
     }
 
-    public URI provideGetCountExecUri(String path, String query, String domain, int offset) {
+    public URI provideGetCountExecUri(String path, String query, String domain) {
         return UriBuilder.fromPath(path)
                 .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
-                .queryParam("domain", domain).queryParam("offset", offset)
+                .queryParam("domain", domain)
                 .queryParam("access_token", accessToken).queryParam("v", version)
                 .build();
     }
