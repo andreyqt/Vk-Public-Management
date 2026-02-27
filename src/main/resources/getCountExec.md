@@ -1,8 +1,9 @@
-#Example of execution on vk script language
+#Example of procedure(execution) on vk script language
 
 var domain = Args.domain;
 var query = Args.query;
 var token = "my_token";
+
 var first_response = API.wall.search({
 "access_token": token,
 "query": query,
@@ -10,8 +11,10 @@ var first_response = API.wall.search({
 "count": 100,
 "offset": 0
 });
+
 var offset = 0;
 var requests = 1;
+
 if (first_response.count < 100) {
 return {
 "count": first_response.count,
@@ -20,9 +23,11 @@ return {
 "message": ""
 };
 }
+
 var count = 100;
 offset = 100;
 var remaining = 24;
+
 while (remaining != 0) {
 var response = API.wall.search({
 "access_token": token,
@@ -31,8 +36,10 @@ var response = API.wall.search({
 "count": 100,
 "offset": offset
 });
+
 count = count + response.count;
 requests = requests + 1;
+
 if (response.count < 100) {
 return {
 "count": count,
@@ -41,9 +48,12 @@ return {
 "message": ""
 };
 }
+
 offset = offset + 100;
 remaining = remaining - 1;
+
 }
+
 return {
 "count": count,
 "requests": requests,
