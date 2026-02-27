@@ -4,7 +4,6 @@ import holymagic.vkpublicmanagement.model.exec.CountResponse;
 import holymagic.vkpublicmanagement.service.ExecuteService;
 import holymagic.vkpublicmanagement.validator.ExecParamValidator;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
