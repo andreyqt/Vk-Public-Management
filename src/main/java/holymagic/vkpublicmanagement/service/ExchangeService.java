@@ -112,22 +112,33 @@ public class ExchangeService {
                 .build();
     }
 
-    public URI provideGetCountExecUri(String path, String query, String domain) {
+    public URI provideGetCountExecUri(String path, String query, String domain, int offset) {
         return UriBuilder.fromPath(path)
                 .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
-                .queryParam("domain", domain)
+                .queryParam("domain", domain).queryParam("offset", offset)
                 .queryParam("access_token", accessToken).queryParam("v", version)
                 .build();
     }
 
     public URI provideGetCountOverPeriodExecUri(String path,
                                                 long beginUnixTimestamp, long endUnixTimestamp,
-                                                String query, String domain) {
+                                                String query, String domain, int offset) {
         return UriBuilder.fromPath(path)
                 .queryParam("query", URLEncoder.encode(query, StandardCharsets.UTF_8))
                 .queryParam("begin", beginUnixTimestamp)
                 .queryParam("end", endUnixTimestamp)
-                .queryParam("domain", domain)
+                .queryParam("domain", domain).queryParam("offset", offset)
+                .queryParam("access_token", accessToken).queryParam("v", version)
+                .build();
+    }
+
+    public URI provideGetFullCountUri(String path,
+                                      long beginUnixTimestamp, long endUnixTimestamp,
+                                      String domain, int offset) {
+        return UriBuilder.fromPath(path)
+                .queryParam("begin", beginUnixTimestamp)
+                .queryParam("end", endUnixTimestamp)
+                .queryParam("domain", domain).queryParam("offset", offset)
                 .queryParam("access_token", accessToken).queryParam("v", version)
                 .build();
     }
