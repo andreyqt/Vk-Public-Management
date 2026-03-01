@@ -1,0 +1,46 @@
+var domain = Args.domain;
+var begin = Args.begin;
+var end = Args.end;
+var offset = Args.offset;
+var token = "my_token";
+
+var count = 0;
+var requests = 0;
+var remaining = 3;
+
+while (remaining != 0) {
+ var response = API.wall.get({
+  "access_token": token,
+  "domain": domain,
+  "count": 100,
+  "offset": offset
+  }).items@.date;
+
+  int i = 0;
+  while (i < response.length) {
+    if (response[i] >= begin && response[i] <= end) {
+      count = count + 1;
+    }
+    i = i + 1;
+  }
+  requests = requests + 1;
+  if (response.length < 100 || response[response.length-1] < begin) {
+    return {
+      "count": count,
+      "offset": offset,
+      "requests": requests,
+      "message": "success"
+    };
+  }
+
+
+  offset = parseInt(offset) + 100;
+  remaining = remaining - 1;
+}
+
+return {
+ "count": count,
+ "requests": requests,
+ "offset": parseInt(offset),
+ "message": "api limit reached"
+};
