@@ -48,4 +48,11 @@ public class WallController {
         return ResponseEntity.ok(wallService.searchPostsOnWall(query, count, offset));
     }
 
+    @GetMapping("/search/all")
+    public ResponseEntity<List<Post>> searchAllPostsOnWall(
+            @RequestParam @NotBlank(message = "query can't be empty") String query
+    ) {
+        return ResponseEntity.ok(wallService.searchAllPostsOnWall(query));
+    }
+
 }

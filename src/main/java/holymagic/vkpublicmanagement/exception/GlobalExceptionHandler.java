@@ -69,4 +69,10 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler(ResponseOverflowException.class)
+    @ResponseStatus(HttpStatus.CONTENT_TOO_LARGE)
+    public ErrorResponse handleResponseOverflowException(ResponseOverflowException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 }
