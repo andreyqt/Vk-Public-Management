@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +36,16 @@ public class WallController {
     @GetMapping("/get/id/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable String id) {
         return ResponseEntity.ok(wallService.getPostById(id));
+    }
+
+    @GetMapping("/get/unpopular")
+    public ResponseEntity<Map<Long, String>> getUnpopularPosts(
+        @RequestParam(required = false, defaultValue = "20") int count,
+        @RequestParam(required = false, defaultValue = "0") int offset
+    ) {
+        wallParamValidator.validateCountUnpopular(count);
+        wallParamValidator.validateOffset(offset);
+        return ResponseEntity.ok(wallService.getPostsWithNoLikes(count, offset));
     }
 
     @GetMapping("/search")

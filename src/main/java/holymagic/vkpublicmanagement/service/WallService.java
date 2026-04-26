@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.POST_RESPONSE_REF;
 import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.WALL_RESPONSE_REF;
@@ -41,6 +43,18 @@ public class WallService {
         List<Post> response = exchangeService.getData(uri, POST_RESPONSE_REF).getItems();
         validateResponse(response);
         return response.getFirst();
+    }
+
+    public Map<Long, String> getPostsWithNoLikes(int count, int offset) {
+        Map<Long, String> result = new HashMap<>();
+        List<Post> response = getPostsFromWall(maxCount, offset);
+        extractPostsWithNoLikes(response, result);
+        while (result.size() < count || response.size() < maxCount) {
+            offset += 100;
+            response = getPostsFromWall(maxCount, offset);
+            extractPostsWithNoLikes(response, result);
+        }
+        return result;
     }
 
     public List<Post> searchPostsOnWall(String query, int count, int offset) {
@@ -74,10 +88,19 @@ public class WallService {
         }
     }
 
-    public void validateSize(List<Post> posts) {
+    private void validateSize(List<Post> posts) {
         if (posts.size() > maxSize) {
             throw new ResponseOverflowException("too many posts");
         }
+    }
+
+    private void extractPostsWithNoLikes(List<Post> posts, Map<Long, String> result) {
+        for (Post post : posts) {
+            if (post.getLikes().getCount() == 0) {
+                result.put(post.getId(), post.getText());
+            }
+        }
+        log.info("extracted post ids, current size is {}", result.size());
     }
 
 }
