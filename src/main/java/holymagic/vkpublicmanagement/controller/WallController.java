@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +38,24 @@ public class WallController {
         return ResponseEntity.ok(wallService.getPostById(id));
     }
 
+    @GetMapping("/get/unpopular")
+    public ResponseEntity<Map<Long, String>> getUnpopularPosts(
+        @RequestParam(required = false, defaultValue = "20") int count,
+        @RequestParam(required = false, defaultValue = "0") int offset
+    ) {
+        wallParamValidator.validateCountUnpopular(count);
+        wallParamValidator.validateOffset(offset);
+        return ResponseEntity.ok(wallService.getPostsWithNoLikes(count, offset));
+    }
+
+    @GetMapping("/get/hashtags")
+    public ResponseEntity<List<String>> getHashtagsFromWall(
+            @RequestParam @NotBlank(message = "hashtag can't be empty") String hashtag
+    ) {
+        wallParamValidator.validateHashtag(hashtag);
+        return ResponseEntity.ok(wallService.getHashtagsFromWall(hashtag));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<Post>> searchPostsOnWall(
             @RequestParam @NotBlank(message = "query can't be empty") String query,
@@ -46,6 +65,13 @@ public class WallController {
         wallParamValidator.validateCount(count);
         wallParamValidator.validateOffset(offset);
         return ResponseEntity.ok(wallService.searchPostsOnWall(query, count, offset));
+    }
+
+    @GetMapping("/search/all")
+    public ResponseEntity<List<Post>> searchAllPostsOnWall(
+            @RequestParam @NotBlank(message = "query can't be empty") String query
+    ) {
+        return ResponseEntity.ok(wallService.searchAllPostsOnWall(query));
     }
 
 }
