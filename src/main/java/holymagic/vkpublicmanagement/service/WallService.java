@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.POST_RESPONSE_REF;
 import static holymagic.vkpublicmanagement.model.ParameterizedTypeReferences.WALL_RESPONSE_REF;
@@ -78,6 +81,19 @@ public class WallService {
         return result;
     }
 
+    public List<String> getHashtagsFromWall(String query) {
+        int offset = defaultOffset;
+        List<Post> response = searchPostsOnWall(query, maxCount, offset);
+        Set<String> result = extractHashtagsFromPost(response);
+        while (response.size() == 100) {
+            offset += 100;
+            response = searchPostsOnWall(query, maxCount, offset);
+            result.addAll(extractHashtagsFromPost(response));
+        }
+        log.info("received all tags for hashtag: {} \n total size: {}", query, result.size());
+        return new ArrayList<>(result);
+    }
+
     private void validateResponse(List<Post> posts) {
         log.info("Received {} posts", posts.size());
         if (posts.isEmpty()) {
@@ -101,6 +117,27 @@ public class WallService {
             }
         }
         log.info("extracted post ids, current size is {}", result.size());
+    }
+
+    private Set<String> extractHashtagsFromPost(List<Post> posts) {
+        Set<String> hashtags = new HashSet<>();
+        for (Post post : posts) {
+            extractHashtagsFromString(post.getText(), hashtags);
+        }
+        return hashtags;
+    }
+
+    private void extractHashtagsFromString(String text, Set<String> hashtags) {
+        for (String hashtag : text.split(" ")) {
+            if (hashtag.startsWith("#")) {
+                String[] tags = hashtag.split("\n");
+                for (String tag : tags) {
+                    if (tag.startsWith("#")) {
+                        hashtags.add(tag.toLowerCase());
+                    }
+                }
+            }
+        }
     }
 
 }

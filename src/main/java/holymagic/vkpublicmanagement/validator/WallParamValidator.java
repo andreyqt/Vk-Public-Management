@@ -30,4 +30,13 @@ public class WallParamValidator {
         }
     }
 
+    public void validateHashtag(String hashtag) {
+        if (!hashtag.startsWith("#")) {
+            throw new ParamValidationException("hashtag must start with '#'");
+        }
+        if (hashtag.contains(" ")) {
+            throw new ParamValidationException("hashtag must not contain spaces");
+        }
+    }
+
 }

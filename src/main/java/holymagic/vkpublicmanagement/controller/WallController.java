@@ -48,6 +48,14 @@ public class WallController {
         return ResponseEntity.ok(wallService.getPostsWithNoLikes(count, offset));
     }
 
+    @GetMapping("/get/hashtags")
+    public ResponseEntity<List<String>> getHashtagsFromWall(
+            @RequestParam @NotBlank(message = "hashtag can't be empty") String hashtag
+    ) {
+        wallParamValidator.validateHashtag(hashtag);
+        return ResponseEntity.ok(wallService.getHashtagsFromWall(hashtag));
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<Post>> searchPostsOnWall(
             @RequestParam @NotBlank(message = "query can't be empty") String query,
