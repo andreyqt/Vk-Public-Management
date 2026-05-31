@@ -1,0 +1,80 @@
+package holymagic.vkpublicmanagement.util;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class LinkManager {
+
+    @Value("${my_public_owner_id}")
+    private String ownerId;
+    @Value("${uri_photo_path}")
+    private String photoPath;
+    @Value("${saved_photo_path}")
+    private String savedPhotoPath;
+
+    public String createPhotoLink(Long photoId, String ownerId) {
+        return photoPath + ownerId + "_" + photoId;
+    }
+
+    public String createPhotoLink(Long photoId) {
+        return createPhotoLink(photoId, ownerId);
+    }
+
+    public List<String> createPhotoLinks(Set<Long> photoIds) {
+        List<String> photoLinks = new ArrayList<>();
+        for (Long photoId : photoIds) {
+            photoLinks.add(createPhotoLink(photoId));
+        }
+        return photoLinks;
+    }
+
+    public void saveLinkToFile(String link) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(savedPhotoPath, true))) {
+            bw.write(link);
+            bw.newLine();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Failed to save link to file: " + e.getMessage());
+        }
+    }
+
+    public void saveLinksToFile(List<String> links, String path) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, true))) {
+            for (String link : links) {
+                bw.write(link);
+                bw.newLine();
+            }
+            log.info("saved {} links to file {}", links.size(), savedPhotoPath);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("Failed to save link to file: " + e.getMessage());
+        }
+    }
+
+    public void saveLinksToFile(List<String> links) {
+        saveLinksToFile(links, savedPhotoPath);
+    }
+
+    public void saveLinksToFile(Set<Long> ids, String path) {
+        List<String> stringLinks = ids.stream()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+        saveLinksToFile(stringLinks, path);
+    }
+
+    public void saveLinksToFile(Set<Long> ids) {
+        saveLinksToFile(ids, savedPhotoPath);
+    }
+
+}

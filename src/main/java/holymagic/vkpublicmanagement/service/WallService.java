@@ -1,8 +1,10 @@
 package holymagic.vkpublicmanagement.service;
 
 import holymagic.vkpublicmanagement.exception.EmptyResponseException;
-import holymagic.vkpublicmanagement.exception.ResponseOverflowException;
 import holymagic.vkpublicmanagement.model.wall.Post;
+import holymagic.vkpublicmanagement.model.wall.attachment.Attachment;
+import holymagic.vkpublicmanagement.model.wall.attachment.Photo;
+import holymagic.vkpublicmanagement.model.wall.attachment.PhotoAttachment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +77,10 @@ public class WallService {
             offset += 100;
             response = searchPostsOnWall(query, maxCount, offset);
             result.addAll(response);
-            validateSize(result);
+            if (result.size() > maxSize) {
+                log.info("capacity limit reached: {}", maxCount);
+                break;
+            }
         }
         log.info("received all posts for query: {} \n total size: {}", query, result.size());
         return result;
@@ -93,19 +99,38 @@ public class WallService {
         return new ArrayList<>(result);
     }
 
-    private void validateResponse(List<Post> posts) {
-        log.info("Received {} posts", posts.size());
-        if (posts.isEmpty()) {
-            throw new EmptyResponseException("Received empty response from server");
-        }
-        if (posts.getFirst().getIsDeleted() != null && posts.getFirst().getIsDeleted()) {
-            throw new EmptyResponseException("Post was deleted");
-        }
+    public Set<Long> getPhotoIds(int count, int offset) {
+        Set<Long> photoIds = new LinkedHashSet<>();
+        List<Post> posts = getPostsFromWall(count, offset);
+        extractPhotoIdsFromPosts(posts, photoIds);
+        log.info("got {} photosIds", photoIds.size());
+        return photoIds;
     }
 
-    private void validateSize(List<Post> posts) {
-        if (posts.size() > maxSize) {
-            throw new ResponseOverflowException("too many posts");
+    public Set<Long> getAllPhotoIds() {
+        int offset = defaultOffset;
+        Set<Long> photoIds = getPhotoIds(maxCount, offset);
+        int size = photoIds.size();
+        offset += maxCount;
+        while (size >= maxCount / 2) {
+            Set<Long> newPhotoIds = getPhotoIds(maxCount, offset);
+            photoIds.addAll(newPhotoIds);
+            offset += maxCount;
+            size = newPhotoIds.size();
+            log.info("current size is {} and offset is {}", photoIds.size(), offset);
+        }
+        log.info("got {} photoIds", photoIds.size());
+        return photoIds;
+    }
+
+    private void validateResponse(List<Post> posts) {
+        if (posts == null) {
+            throw new EmptyResponseException("received empty response");
+        }
+        log.info("Received {} posts", posts.size());
+        if (posts.isEmpty()) return;
+        if (posts.getFirst().getIsDeleted() != null && posts.getFirst().getIsDeleted()) {
+            throw new EmptyResponseException("Post was deleted");
         }
     }
 
@@ -134,6 +159,18 @@ public class WallService {
                     if (tag.startsWith("#")) {
                         hashtags.add(tag.toLowerCase());
                     }
+                }
+            }
+        }
+    }
+
+    private void extractPhotoIdsFromPosts(List<Post> posts, Set<Long> photoIds) {
+        for (Post post : posts) {
+            List<Attachment> attachments = post.getAttachments();
+            for (Attachment attachment : attachments) {
+                if (attachment instanceof PhotoAttachment photoAttachment) {
+                    Photo photo = photoAttachment.getPhoto();
+                    photoIds.add(photo.getId());
                 }
             }
         }

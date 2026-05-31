@@ -38,6 +38,9 @@ public class ExchangeService {
     @Value("${wall_search_path}")
     private String wallSearchPath;
 
+    @Value("${get_wall_album_path}")
+    private String getWallAlbumPath;
+
     @Value("${get_user_path}")
     private String getUserPath;
     @Value("${get_followers_path}")
@@ -141,6 +144,19 @@ public class ExchangeService {
                 .queryParam("domain", domain).queryParam("offset", offset)
                 .queryParam("access_token", accessToken).queryParam("v", version)
                 .build();
+    }
+
+    public URI provideGetAlbumUri(int count, int offset, boolean rev, String ownerId, String album_id) {
+        return UriBuilder.fromPath(getWallAlbumPath)
+                .queryParam("access_token", accessToken).queryParam("v", version)
+                .queryParam("count", count).queryParam("offset", offset)
+                .queryParam("rev", rev).queryParam("owner_id", ownerId)
+                .queryParam("album_id", album_id)
+                .build();
+    }
+
+    public URI provideGetWallAlbumUri(int count, int offset, boolean rev, String ownerId) {
+        return provideGetAlbumUri(count, offset, rev, ownerId, "wall");
     }
 
 }
