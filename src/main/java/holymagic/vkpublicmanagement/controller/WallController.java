@@ -7,6 +7,7 @@ import holymagic.vkpublicmanagement.util.LinkManager;
 import holymagic.vkpublicmanagement.validator.WallParamValidator;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,9 @@ public class WallController {
     private final WallService wallService;
     private final WallParamValidator wallParamValidator;
     private final LinkManager linkManager;
+
+    @Value("${saved_photo_path}")
+    private String photoIdsPath;
 
     @GetMapping("/get")
     public ResponseEntity<List<Post>> getPostsFromWall(
@@ -117,7 +121,7 @@ public class WallController {
     @PostMapping("/photo/ids/all")
     public ResponseEntity<SuccessResponse> saveAllPhotoIds() {
         Set<Long> allPhotoIds = wallService.getAllPhotoIds();
-        linkManager.saveLinksToFile(allPhotoIds);
+        linkManager.saveLinksToFile(allPhotoIds, photoIdsPath);
         return ResponseEntity.ok(new SuccessResponse("all photo ids were saved successfully"));
     }
 

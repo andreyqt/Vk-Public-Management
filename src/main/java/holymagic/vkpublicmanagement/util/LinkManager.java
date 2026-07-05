@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,6 +25,10 @@ public class LinkManager {
     private String photoPath;
     @Value("${saved_photo_path}")
     private String savedPhotoPath;
+    @Value("${init_capacity}")
+    private int initCapacity;
+    @Value("${load_factor}")
+    private float loadFactor;
 
     public String createPhotoLink(Long photoId, String ownerId) {
         return photoPath + ownerId + "_" + photoId;
@@ -39,7 +46,7 @@ public class LinkManager {
         return photoLinks;
     }
 
-    public void saveLinkToFile(String link) {
+    public void savePhotoLinkToFile(String link) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(savedPhotoPath, true))) {
             bw.write(link);
             bw.newLine();
@@ -75,6 +82,27 @@ public class LinkManager {
 
     public void saveLinksToFile(Set<Long> ids) {
         saveLinksToFile(ids, savedPhotoPath);
+    }
+
+    public Set<Long> readIdsFromFile(String path) {
+        Set<Long> ids = new HashSet<>(initCapacity, loadFactor);
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    try {
+                        ids.add(Long.parseLong(line.trim()));
+                    } catch (NumberFormatException e) {
+                        log.warn("couldn't parse id: {}", line);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.error("couldn't read from file: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+        log.info("read {} ids from file: {}", ids.size(), path);
+        return ids;
     }
 
 }
