@@ -9,7 +9,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,24 +38,17 @@ public class LinkManager {
     }
 
     public List<String> createPhotoLinks(Set<Long> photoIds) {
-        List<String> photoLinks = new ArrayList<>();
-        for (Long photoId : photoIds) {
-            photoLinks.add(createPhotoLink(photoId));
-        }
-        return photoLinks;
+        return photoIds.stream()
+                       .map(this::createPhotoLink)
+                       .collect(Collectors.toList());
     }
 
     public void savePhotoLinkToFile(String link) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(savedPhotoPath, true))) {
-            bw.write(link);
-            bw.newLine();
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException("Failed to save link to file: " + e.getMessage());
-        }
+        saveLinksToFile(List.of(link), savedPhotoPath);
     }
 
     public void saveLinksToFile(List<String> links, String path) {
+       validatePhotoLinks(links);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, true))) {
             for (String link : links) {
                 bw.write(link);
@@ -103,6 +95,12 @@ public class LinkManager {
         }
         log.info("read {} ids from file: {}", ids.size(), path);
         return ids;
+    }
+
+    private void validatePhotoLinks(List<String> links) {
+        if (links == null || links.isEmpty()) {
+            throw new IllegalArgumentException("link(s) is null or empty");
+        }
     }
 
 }
