@@ -9,8 +9,12 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 @Service
 public class LinkManager {
 
+    @Value("${vk_wall_path}")
+    private String vkPath;
     @Value("${my_public_owner_id}")
     private String ownerId;
     @Value("${uri_photo_path}")
@@ -39,8 +45,16 @@ public class LinkManager {
 
     public List<String> createPhotoLinks(Set<Long> photoIds) {
         return photoIds.stream()
-                       .map(this::createPhotoLink)
-                       .collect(Collectors.toList());
+                .map(this::createPhotoLink)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> createWallSearchLinks(List<String> hashtags) {
+        return hashtags.stream()
+                .map(tag -> new AbstractMap.SimpleEntry<>(URLEncoder.encode(tag, StandardCharsets.UTF_8), mapHashtagToText(tag)))
+                .sorted(Map.Entry.comparingByValue())
+                .map(entry -> "[" + vkPath + ownerId + "?q=" + entry.getKey() + "|" + entry.getValue() + "]")
+                .toList();
     }
 
     public void savePhotoLinkToFile(String link) {
@@ -48,7 +62,7 @@ public class LinkManager {
     }
 
     public void saveLinksToFile(List<String> links, String path) {
-       validatePhotoLinks(links);
+        validatePhotoLinks(links);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(path, true))) {
             for (String link : links) {
                 bw.write(link);
@@ -101,6 +115,14 @@ public class LinkManager {
         if (links == null || links.isEmpty()) {
             throw new IllegalArgumentException("link(s) is null or empty");
         }
+    }
+
+    private String mapHashtagToText(String hashtag) {
+        String[] words = hashtag.substring(1).split("_");
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].substring(0, 1).toUpperCase() + words[i].substring(1);
+        }
+        return String.join(" ", words);
     }
 
 }
