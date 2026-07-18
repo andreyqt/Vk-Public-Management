@@ -15,6 +15,8 @@ import lombok.Setter;
 public class Photo {
     private Long id;
     private Long date;
+    @JsonProperty("album_id")
+    private Long albumId;
     @JsonProperty("post_id")
     private Long postId;
     private String text;

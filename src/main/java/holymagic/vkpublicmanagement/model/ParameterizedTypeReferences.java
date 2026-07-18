@@ -1,11 +1,13 @@
 package holymagic.vkpublicmanagement.model;
 
 import holymagic.vkpublicmanagement.model.exec.CountResponse;
+import holymagic.vkpublicmanagement.model.photo.PhotoResponse;
 import holymagic.vkpublicmanagement.model.user.FollowerResponse;
 import holymagic.vkpublicmanagement.model.user.SubscriptionResponse;
 import holymagic.vkpublicmanagement.model.user.User;
 import holymagic.vkpublicmanagement.model.wall.PostResponse;
 import holymagic.vkpublicmanagement.model.wall.WallResponse;
+import holymagic.vkpublicmanagement.model.wall.attachment.Photo;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.List;
@@ -28,6 +30,9 @@ public class ParameterizedTypeReferences {
             new ParameterizedTypeReference<>() {};
 
     public static final ParameterizedTypeReference<Root<CountResponse>> EXEC_COUNT_REF =
+            new ParameterizedTypeReference<>() {};
+
+    public static final ParameterizedTypeReference<Root<PhotoResponse>> PHOTOS_RESPONSE_REF =
             new ParameterizedTypeReference<>() {};
 
 }
